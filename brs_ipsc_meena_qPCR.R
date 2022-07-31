@@ -98,3 +98,36 @@ pheatmap(t(mm), cutree_cols = 2, cluster_rows = T, cluster_cols = T,annotation_c
          cellwidth = 15, cellheight = 18, fontsize = 8, 
          main= "x")
 
+       
+#NORM BY 16
+
+delta16_all_data_fil<- 2^-(all_data_fil-all_data_fil[,7])
+delta16_all_data_fil<-delta16_all_data_fil[-2,] #samples off mir16
+
+#BOxPLoT AND MW TEST
+type<-c('Control', 'Control', rep('BrS',4), rep('Control',2), rep('BrS',2), 'Control')
+
+delta16_all_data_fil_type<- cbind(delta16_all_data_fil, type)
+delta16_all_data_fil_type$type <- factor(delta16_all_data_fil_type$type, levels=c("Control", "BrS"))
+delta16_all_data_fil_type
+
+for (i in c(2:18)){
+  boxplot(data=delta16_all_data_fil_type, delta16_all_data_fil_type[,i]~type)
+}
+
+for (i in c(2:18)) {
+  print(wilcox.test(delta16_all_data_fil_type[,i]~type, data=subset(delta16_all_data_fil_type, type %in% c("Control", "BrS"))))
+}
+
+#HEATMAPS
+
+cat_df = data.frame("Classification"=delta16_all_data_fil_type$type)
+head(cat_df)
+rownames(cat_df) = row.names(delta16_all_data_fil)
+cat_df
+mm<- data.matrix(delta16_all_data_fil[,c(2:18)])
+dim(mm)
+mm
+pheatmap(t(log(mm)), cutree_cols = 2, cluster_rows = T, cluster_cols = T,annotation_col = cat_df, show_colnames =F,
+         cellwidth = 15, cellheight = 18, fontsize = 8, 
+         main= "x")
