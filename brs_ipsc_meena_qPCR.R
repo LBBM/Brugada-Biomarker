@@ -73,40 +73,50 @@ head(all_data_fil)
 #NORM BY miRNA-39
 
 delta39_all_data_fil<- 2^-(all_data_fil-all_data_fil[,1])
-delta39_all_data_fil
-
+delta39_all_data_fil<- delta39_all_data_fil[-12,] #Filt by samples
+dim(delta39_all_data_fil)
 #CV IN %
 sapply(all_data_fil, function(x) sd(x, na.rm=T) / mean(x, na.rm=T) * 100)
 
 #BOXPLOT AND M.W. TEST
-type<-c('Control', 'BrS', 'Control', rep('BrS',4), rep('Control',2), rep('BrS',2), 'Control')
+type<-c('BrS', 'Control', rep('BrS',4), 'Control','BrS',
+        rep('Control',3))
 
 delta39_all_data_fil_type<- cbind(delta39_all_data_fil, type)
-delta39_all_data_fil_type$type <- factor(delta39_all_data_fil_type$type, levels=c("Control", "BrS")) #to put control first
-delta39_all_data_fil_type
+delta39_all_data_fil_type$type <- factor(delta39_all_data_fil_type$type, 
+                                         levels=c("Control", "BrS")) #to put control first
 
 for (i in c(2:18)) {
 boxplot(data=delta39_all_data_fil_type, delta39_all_data_fil_type[,i]~type)
 }
        
 for (i in c(2:18)) {
- print(wilcox.test(delta39_all_data_fil_type[,i]~type, data=subset(delta39_all_data_fil_type, type %in% c("Control", "BrS"))))
+ print(wilcox.test(delta39_all_data_fil_type[,i]~type, 
+                   data=subset(delta39_all_data_fil_type, 
+                               type %in% c("Control", "BrS"))))
 }
 
 #HEATMAP
 
 cat_df = data.frame("Classification"=delta39_all_data_fil_type$type)
-head(cat_df)
-rownames(cat_df) = row.names(delta39_all_data_fil)
+head(cat_df, 12)
+rownames(cat_df) = row.names(delta39_all_data_fil_type)
 
 mm<- data.matrix(delta39_all_data_fil[,c(2:18)])
 dim(mm)
 
-pheatmap(t(mm), cutree_cols = 2, cluster_rows = T, cluster_cols = T,annotation_col = cat_df, show_colnames =F,
+pheatmap(t(mm), cutree_cols = 2, cluster_rows = F, cluster_cols = T,
+         annotation_col = cat_df, show_colnames =F,
          cellwidth = 15, cellheight = 18, fontsize = 8, 
-         main= "x")
+         main= "Heatmap 17 miRNAs expression in IPSC-CM between BrS and Control")
 
        
+
+
+
+
+
+
 #NORM BY 16
 
 delta16_all_data_fil<- 2^-(all_data_fil-all_data_fil[,7])
