@@ -1,8 +1,16 @@
 library(pheatmap)
-
+library(ggplot2)
+getwd()
 data<-read.csv("miRNA_iPSC-CM_BrS_qPCRresults.txt", sep = "\t", header = T)
+head(data)
 
-boxplot(data=data, Cq.Mean~Target)
+data$Sample <- factor(data$Sample, levels=c("10_2991_CT","11_3002_CT","12_3014_CT",
+"14_3036_CT","7_2917_CT","9_2985_BrS","1_2747_BrS","13_2995_BrS","2_2748_BrS",
+"4_2775_BrS","5_2790_BrS","6_2914_BrS"))
+
+ggplot(data, aes(x=Sample, y=Cq.Mean, fill=Type)) +
+  geom_boxplot(varwidth = TRUE, alpha=0.2) +
+  theme(legend.position="none")
 
 samples1<- as.data.frame(t(data[c(1:24),3]))
 colnames(samples1)<- data[c(1:24),2]
