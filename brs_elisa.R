@@ -42,7 +42,14 @@ pheatmap(log(t(mm)), cutree_cols = 3, cluster_rows = T, cluster_cols = F, annota
          cellwidth = 15, cellheight = 18, fontsize = 8, 
          main= "Cluster autoantibodys log (O.D.) by Shanghay Classification Laval samples", filename = "Heatmap_laval.jpeg")
 
+incor<- subset(dnam, id_2 == "Incor")
 
+mm<- data.matrix(incor[,c(3:5)])
+dim(mm)
+
+pheatmap(log(t(mm)), cutree_cols = 3, cluster_rows = T, cluster_cols = F, annotation_col = cat_df, show_colnames =F,
+         cellwidth = 15, cellheight = 18, fontsize = 8, 
+         main= "Cluster autoantibodys log (O.D.) by Shanghay Classification INCOR samples", filename = "Heatmap_INCOR.jpeg")
 
 
 
