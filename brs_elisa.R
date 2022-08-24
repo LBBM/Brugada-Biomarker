@@ -138,12 +138,6 @@ plot(pca$x)
 text(pca$x, colnames(mm), col ='red')
 
 
-
-
-
-
-
-
 install.packages("cutpointr")
 install.packages("pROC")
 library(pROC)
@@ -176,18 +170,77 @@ summary(cp)
 
 cat_df
 
+################################################################################
 
-#ROC Curve
+####ROC Curve
 
 library(plotROC)
 
-dnam2 <- read.csv("brs_dataset_roc.txt", sep = "\t")
-head(dnam2)
+dnam <- read.csv("brs_dataset_incor_laval_norm.txt", sep = "\t")
+head(dnam)
+row.names(dnam)<- dnam[,1]
+dnam<- dnam[,-1]
+
+control_data<- subset(dnam, Class == "Control")
+
+actin_c<- as.data.frame(control_data[,3])
+colnames(actin_c)<-"M"
+keratin_c<- as.data.frame(control_data[,4])
+colnames(keratin_c)="M"
+connexin_c<- as.data.frame(control_data[,5])
+colnames(connexin_c)="M"
+means_c<- as.data.frame(control_data[,6])
+colnames(means_c)="M"
+M_c<-rbind(actin_c,keratin_c,connexin_c,means_c)
+
+
+
+Biomarker<- as.data.frame(c(rep("Actin",27), rep("Keratin", 27),rep("Connexin",27),rep("Means",27)))
+colnames(Biomarker)="Biomarker"
+
+D_c<-as.data.frame(as.numeric(rep("0", 27*4)))
+names(D_c)="D"
+
+dnam_c<- cbind(D_c,M_c,Biomarker)
+
+BrS_data<- subset(dnam, Class == "BrS")
+
+actin_b<- as.data.frame(BrS_data[,3])
+colnames(actin_b)<-"M"
+keratin_b<- as.data.frame(BrS_data[,4])
+colnames(keratin_b)="M"
+connexin_b<- as.data.frame(BrS_data[,5])
+colnames(connexin_b)="M"
+means_b<- as.data.frame(BrS_data[,6])
+colnames(means_b)="M"
+M_b<-rbind(actin_b,keratin_b,connexin_b,means_b)
+
+Biomarker_b<- as.data.frame(c(rep("Actin",35), rep("Keratin", 35),rep("Connexin",35),rep("Means",35)))
+colnames(Biomarker_b)="Biomarker"
+
+D_b<-as.data.frame(as.numeric(rep("1", 35*4)))
+names(D_b)="D"
+
+dnam_b<- cbind(D_b,M_b,Biomarker_b)
+head(dnam_b)
+
+dnam2<- rbind(dnam_c,dnam_b)
+dnam2$Biomarker <- factor(dnam2$Biomarker, levels=c("Means", "Connexin", "Actin","Keratin"))
+
 
 basicplot<- ggplot(dnam2, aes(d = D, m = M, color = Biomarker)) + geom_roc(n.cuts = 0) 
-basicplot + style_roc()
-  
-annotate("text", x = .75, y = .25, 
-         label = paste("AUC =", round(calc_auc(basicplot)$AUC, 4)))
+p1<- basicplot + style_roc(major.breaks = c(0, 0.1, 0.25, 0.5, 0.75, 0.9, 1),
+                      minor.breaks = c(seq(0, 0.1, by = 0.01), seq(0.9, 1, by = 0.01)),
+                      guide = TRUE,
+                      xlab = "1 - Specificity (FPF)",
+                      ylab = "Sensitivity (TPF)",)+
+  annotate("text",x = .5, y = .60, label = paste("AUC - Means O.D. =", round(calc_auc(basicplot)$AUC, 3)[1]))+
+  annotate("text",x = .518, y = .50, label = paste("AUC - Connesin O.D. =", round(calc_auc(basicplot)$AUC, 3)[2]))+
+  annotate("text",x = .49, y = .40, label = paste("AUC - Actin O.D. =", round(calc_auc(basicplot)$AUC, 3)[3]))+
+  annotate("text",x = .5, y = .30, label = paste("AUC - Keratin O.D. =", round(calc_auc(basicplot)$AUC, 3)[4]))
+ 
 
-
+p1 + theme(axis.title=element_text(size = 14),
+           axis.text=element_text(size = 12),
+           legend.text=element_text(size=12),
+           legend.title=element_text(size = 12))
