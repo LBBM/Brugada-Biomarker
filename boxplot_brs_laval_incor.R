@@ -8,7 +8,6 @@ head(dnam)
 row.names(dnam)<- dnam[,1]
 dnam<- dnam[,-1]
 head(dnam)
-dim(dnam)
 
 dnam$Class <- factor(dnam$Class, levels=c("Control", "Possible", "BrS"))
 

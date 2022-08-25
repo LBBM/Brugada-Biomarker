@@ -3,7 +3,6 @@ library(readr)
 ###HEATMAPS
 
 library(pheatmap)
-getwd()
 
 #####data from INCOR/BR + Laval normalized by |O.D. value - means control|
 dnam <- read.csv("brs_dataset_incor_laval_norm.txt", sep = "\t")
